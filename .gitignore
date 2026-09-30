@@ -1,0 +1,6 @@
+*.o
+*.exe
+*.out
+a.out
+mfms_test
+.vscode/
