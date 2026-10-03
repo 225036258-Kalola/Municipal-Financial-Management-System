@@ -2,9 +2,9 @@
 #include <string.h>
 #include "suppliers.h"
 
-static supplier
-suppliers[MAX_SUPPLIERS];
-static int supplierCount = 0;
+supplier suppliers[MAX_SUPPLIERS];
+
+int supplierCount = 0;
 
 void addSupplier(void)
 {
@@ -37,7 +37,7 @@ s->town[strcspn(s->town, "\n")] = '\0';
 
 supplierCount++;
 
-prinf("\nSupplier added successfully!\n");
+printf("\nSupplier added successfully!\n");
 }
 
 void displaySuppliers(void)

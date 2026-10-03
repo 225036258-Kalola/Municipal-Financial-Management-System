@@ -91,19 +91,5 @@ void employeeReport(){
     printf("Total:%d Average:N$%.2f\n", empCount, sum/empCount);
 }
 
-int main(){
-    int ch;
-    do{
-        printf("\n1.Add 2.Display 3.Search 4.Report 5.Exit\nChoice: ");
-        scanf("%d",&ch);
-        switch(ch){
-            case 1: addEmployee(); break;
-            case 2: displayEmployees(); break;
-            case 3: searchEmployee(); break;
-            case 4: employeeReport(); break;
-            case 5: printf("Bye\n"); break;
-            default: printf("Invalid choice!\n");
-        }
-    }while(ch!=5);
-    return 0;
-}
+
+   
