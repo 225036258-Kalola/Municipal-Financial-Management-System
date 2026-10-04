@@ -1,17 +1,26 @@
 #ifndef EMPLOYEES_H
 #define EMPLOYEES_H
 
-#include "mfms.h"
+#define MAX_EMPLOYEES 100
+#define NAME_LEN 50
+#define DEPT_LEN 30
 
-void addEmployee();
-void displayEmployees();
-void searchEmployee();
-void employeeReport();
+typedef struct {
+    int id;
+    char name[NAME_LEN];
+    char department[DEPT_LEN];
+    double basic_salary;
+    double housing_allowance;
+    double transport_allowance;
+    double gross_salary;
+} Employee;
 
-float calculateSalary(float basic, float housing, float transport);
-int isEmptyName(char *str);
+// Function Declarations
+void initEmployees(Employee employees[], int *count);
+void addEmployee(Employee employees[], int *count);
+void displayEmployees(const Employee employees[], int count);
+void searchEmployee(const Employee employees[], int count);
+void calculateSalary(Employee *emp);
+void displaySingleEmployee(const Employee *emp);
 
-extern int empCount;
-extern struct Employee employees[];
-
-#endif
+#endif // EMPLOYEES_H
