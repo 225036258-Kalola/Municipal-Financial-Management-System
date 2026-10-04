@@ -1,95 +1,182 @@
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
+#include "employees.h"
 
-#define MAX_EMP 100
-
-struct Employee {
-    int id;
-    char name[50];
-    char department[30];
-    float basicSalary;
-    float housingAllowance;
-    float transportAllowance;
-};
-
-struct Employee employees[MAX_EMP];
-int empCount = 0;
-
-float calculateSalary(float basic, float housing, float transport){
-    return basic + housing + transport;
+// Clear input buffer helper function
+static void clearBuffer(void) {
+    int c;
+    while ((c = getchar()) != '\0' && c != EOF);
 }
 
-int isEmptyName(char *str){
-    if(strlen(str)==0) return 1;
-    for(int i=0;i<strlen(str);i++){
-        if(!isspace(str[i])) return 0;
+// Helper function to handle string inputs safely
+static void readString(char *buffer, int size, const char *prompt) {
+    do {
+        printf("%s", prompt);
+        if (fgets(buffer, size, stdin) != NULL) {
+            // Remove newline character if present
+            size_t len = strlen(buffer);
+            if (len > 0 && buffer[len - 1] == '\n') {
+                buffer[len - 1] = '\0';
+            }
+        }
+        if (strlen(buffer) == 0) {
+            printf("Error: Input cannot be empty. Please try again.\n");
+        }
+    } while (strlen(buffer) == 0);
+}
+
+// Helper function for non-negative float/double inputs
+static double readPositiveDouble(const char *prompt) {
+    double value;
+    int status;
+    do {
+        printf("%s", prompt);
+        status = scanf("%lf", &value);
+        if (status != 1 || value < 0) {
+            printf("Error: Please enter a valid non-negative number.\n");
+            clearBuffer();
+        }
+    } while (status != 1 || value < 0);
+    clearBuffer();
+    return value;
+}
+
+// Calculates salary components for an employee
+void calculateSalary(Employee *emp) {
+    emp->gross_salary = emp->basic_salary + emp->housing_allowance + emp->transport_allowance;
+}
+
+// Adds a new employee with full validation
+void addEmployee(Employee employees[], int *count) {
+    if (*count >= MAX_EMPLOYEES) {
+        printf("\n[ERROR] Employee database is full! Cannot add more employees.\n");
+        return;
     }
-    return 1;
+
+    Employee newEmp;
+    printf("\n--- ADD NEW EMPLOYEE ---\n");
+
+    // Auto-generate or set unique ID based on count
+    newEmp.id = *count + 101;
+    printf("Assigned Employee ID: %d\n", newEmp.id);
+
+    readString(newEmp.name, NAME_LEN, "Enter Name: ");
+    readString(newEmp.department, DEPT_LEN, "Enter Department: ");
+
+    newEmp.basic_salary = readPositiveDouble("Enter Basic Salary (N$): ");
+    newEmp.housing_allowance = readPositiveDouble("Enter Housing Allowance (N$): ");
+    newEmp.transport_allowance = readPositiveDouble("Enter Transport Allowance (N$): ");
+
+    // Perform salary calculation
+    calculateSalary(&newEmp);
+
+    // Save to array
+    employees[*count] = newEmp;
+    (*count)++;
+
+    printf("\n[SUCCESS] Employee successfully added!\n");
 }
 
-void addEmployee(){
-    if(empCount>=MAX_EMP){ printf("Full!\n"); return; }
-    struct Employee e;
-    printf("Enter ID: ");
-    scanf("%d",&e.id);
-    if(e.id<=0){ printf("ID cannot be negative!\n"); return; }
-    for(int i=0;i<empCount;i++) if(employees[i].id==e.id){ printf("ID exists!\n"); return; }
-
-    printf("Enter Name: ");
-    getchar();
-    fgets(e.name,50,stdin);
-    e.name[strcspn(e.name,"\n")]='\0';
-    if(isEmptyName(e.name)){ printf("Empty name not allowed!\n"); return; }
-
-    printf("Enter Department: ");
-    fgets(e.department,30,stdin);
-    e.department[strcspn(e.department,"\n")]='\0';
-
-    printf("Enter Basic Salary: ");
-    scanf("%f",&e.basicSalary);
-    if(e.basicSalary<0){ printf("Negative salary not accepted!\n"); return; }
-
-    printf("Enter Housing: ");
-    scanf("%f",&e.housingAllowance);
-    printf("Enter Transport: ");
-    scanf("%f",&e.transportAllowance);
-
-    employees[empCount]=e;
-    empCount++;
-    printf("Employee %s added! Total %d\n", e.name, empCount);
+// Displays individual employee details
+void displaySingleEmployee(const Employee *emp) {
+    printf("| %-5d | %-20s | %-15s | N$%-10.2f | N$%-10.2f | N$%-10.2f | N$%-10.2f |\n",
+           emp->id,
+           emp->name,
+           emp->department,
+           emp->basic_salary,
+           emp->housing_allowance,
+           emp->transport_allowance,
+           emp->gross_salary);
 }
 
-void displayEmployees(){
-    if(empCount==0){ printf("No employees.\n"); return; }
-    for(int i=0;i<empCount;i++){
-        float total=calculateSalary(employees[i].basicSalary, employees[i].housingAllowance, employees[i].transportAllowance);
-        printf("ID:%d Name:%s Dept:%s Total:N$%.2f\n", employees[i].id, employees[i].name, employees[i].department, total);
+// Displays all stored employees
+void displayEmployees(const Employee employees[], int count) {
+    if (count == 0) {
+        printf("\nNo employee records found in system.\n");
+        return;
     }
+
+    printf("\n====================================================================================================\n");
+    printf("| %-5s | %-20s | %-15s | %-12s | %-12s | %-12s | %-12s |\n",
+           "ID", "Name", "Department", "Basic (N$)", "House (N$)", "Trans (N$)", "Gross (N$)");
+    printf("====================================================================================================\n");
+
+    for (int i = 0; i < count; i++) {
+        displaySingleEmployee(&employees[i]);
+    }
+    printf("====================================================================================================\n");
+    printf("Total Employees: %d\n", count);
 }
 
-void searchEmployee(){
-    char query[50];
-    printf("Enter Name to search: ");
-    getchar();
-    fgets(query,50,stdin);
-    query[strcspn(query,"\n")]='\0';
-    for(int i=0;i<empCount;i++){
-        if(strcmp(employees[i].name,query)==0){
-            printf("FOUND ID:%d Name:%s Dept:%s\n", employees[i].id, employees[i].name, employees[i].department);
+// Searches for an employee by Name (using strcmp/strstr) or ID
+void searchEmployee(const Employee employees[], int count) {
+    if (count == 0) {
+        printf("\nNo employee records available to search.\n");
+        return;
+    }
+
+    int choice;
+    printf("\n--- SEARCH EMPLOYEE ---\n");
+    printf("1. Search by Employee ID\n");
+    printf("2. Search by Employee Name\n");
+    printf("Enter choice: ");
+    
+    if (scanf("%d", &choice) != 1) {
+        clearBuffer();
+        printf("Invalid choice.\n");
+        return;
+    }
+    clearBuffer();
+
+    if (choice == 1) {
+        int searchId;
+        printf("Enter Employee ID to search: ");
+        if (scanf("%d", &searchId) != 1) {
+            clearBuffer();
+            printf("Invalid ID format.\n");
             return;
         }
+        clearBuffer();
+
+        for (int i = 0; i < count; i++) {
+            if (employees[i].id == searchId) {
+                printf("\nMatch Found:\n");
+                printf("====================================================================================================\n");
+                printf("| %-5s | %-20s | %-15s | %-12s | %-12s | %-12s | %-12s |\n",
+                       "ID", "Name", "Department", "Basic (N$)", "House (N$)", "Trans (N$)", "Gross (N$)");
+                printf("====================================================================================================\n");
+                displaySingleEmployee(&employees[i]);
+                printf("====================================================================================================\n");
+                return;
+            }
+        }
+        printf("\nNo employee found with ID: %d\n", searchId);
+
+    } else if (choice == 2) {
+        char searchName[NAME_LEN];
+        readString(searchName, NAME_LEN, "Enter Employee Name to search: ");
+
+        int found = 0;
+        for (int i = 0; i < count; i++) {
+            if (strcmp(employees[i].name, searchName) == 0) {
+                if (!found) {
+                    printf("\nMatch Found:\n");
+                    printf("====================================================================================================\n");
+                    printf("| %-5s | %-20s | %-15s | %-12s | %-12s | %-12s | %-12s |\n",
+                           "ID", "Name", "Department", "Basic (N$)", "House (N$)", "Trans (N$)", "Gross (N$)");
+                    printf("====================================================================================================\n");
+                }
+                displaySingleEmployee(&employees[i]);
+                found = 1;
+            }
+        }
+
+        if (found) {
+            printf("====================================================================================================\n");
+        } else {
+            printf("\nNo employee found matching name: \"%s\"\n", searchName);
+        }
+    } else {
+        printf("\nInvalid search selection.\n");
     }
-    printf("Not found!\n");
 }
-
-void employeeReport(){
-    if(empCount==0){ printf("No data.\n"); return; }
-    float sum=0;
-    for(int i=0;i<empCount;i++) sum+=calculateSalary(employees[i].basicSalary, employees[i].housingAllowance, employees[i].transportAllowance);
-    printf("Total:%d Average:N$%.2f\n", empCount, sum/empCount);
-}
-
-
-   
