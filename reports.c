@@ -50,7 +50,7 @@ void displayReportsMenu(void) {
 /* ---------- 1. EMPLOYEE REPORT ---------- */
 
 void generateEmployeeReport(void) {
-    if (empCount == 0) {
+    if (employeeCount == 0) {
         printf("\nNo employees registered.\n");
         return;
     }
@@ -60,7 +60,7 @@ void generateEmployeeReport(void) {
     double lowest   = grossSalary(&employees[0]);
     int    highIdx  = 0, lowIdx = 0;
 
-    for (int i = 0; i < empCount; i++) {
+    for (int i = 0; i < employeeCount; i++) {
         double g = grossSalary(&employees[i]);
         total += g;
 
@@ -71,8 +71,8 @@ void generateEmployeeReport(void) {
     printLine();
     printf("               EMPLOYEE REPORT\n");
     printLine();
-    printf("Total Employees : %d\n", empCount);
-    printf("Average Salary  : N$%.2f\n", total / empCount);
+    printf("Total Employees : %d\n", employeeCount);
+    printf("Average Salary  : N$%.2f\n", total / employeeCount);
     printf("Highest Salary  : N$%.2f  (%s)\n", highest, employees[highIdx].name);
     printf("Lowest Salary   : N$%.2f  (%s)\n", lowest,  employees[lowIdx].name);
     printLine();
