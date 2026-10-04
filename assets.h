@@ -8,13 +8,13 @@ typedef struct
     int assetID;
     char assetName[50];
     char assetType[30];
-    float purchaseValue;
+    double purchaseValue;
     char department[30];
     char condition[20];
 } Asset;
 
-void addAsset();
-void displayAssets();
-void searchAsset();
+void addAsset(void);
+void displayAssets(void);
+void searchAsset(void);
 
 #endif
