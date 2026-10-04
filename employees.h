@@ -6,12 +6,12 @@
 void addEmployee();
 void displayEmployees();
 void searchEmployee();
-void displaySalaryInfo();
+void employeeReport();
 
 float calculateSalary(float basic, float housing, float transport);
-
 int isEmptyName(char *str);
 
 extern int empCount;
+extern struct Employee employees[];
 
 #endif
